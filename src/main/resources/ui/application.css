@@ -1,0 +1,18 @@
+.label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+}
+#tokenBtn {
+    -fx-graphic: url('/images/usb-flash-drive-logo.png')
+}
+#addKeyBtn {
+    -fx-graphic: url('/images/key--plus.png')
+}
+#signBtn{
+    -fx-font-weight: bold;
+}
+#removeKeyBtn {
+    -fx-graphic: url('/images/key--minus.png')
+}

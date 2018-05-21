@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<GridPane alignment="center" hgap="10" styleClass="root" vgap="10" xmlns="http://javafx.com/javafx/8.0.76-ea"
+          xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.elewise.ui.SignerAppController">
+    <stylesheets>
+        <URL value="@application.css"/>
+    </stylesheets>
+    <padding>
+        <Insets bottom="5" left="15" right="15" top="5"/>
+    </padding>
+    <HBox alignment="BASELINE_LEFT" spacing="10" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="0">
+        <ToggleButton fx:id="tokenBtn" onAction="#handleTokenBtnAction">
+            <tooltip>
+                <Tooltip text="Использовать токен для подписи"/>
+            </tooltip>
+        </ToggleButton>
+        <Button fx:id="addKeyBtn" onAction="#handleAddKeyBtnAction" text="Добавить ключ">
+            <tooltip>
+                <Tooltip text="Добавить ключ в список"/>
+            </tooltip>
+        </Button>
+        <Button fx:id="removeKeyBtn" onAction="#handleRemoveKeyBtnAction" text="Удалить ключ">
+            <tooltip>
+                <Tooltip text="Удалить ключ из списка"/>
+            </tooltip>
+        </Button>
+    </HBox>
+    <Label text="Файл:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+    <HBox prefWidth="620" GridPane.columnIndex="1" GridPane.rowIndex="1">
+        <TextField fx:id="chosenFile" disable="true" prefWidth="525">
+            <tooltip>
+                <Tooltip text="Файл для подписи"/>
+            </tooltip>
+        </TextField>
+        <Button fx:id="chooseFileBtn" disable="true" onAction="#chooseFile" text="Выбрать файл">
+            <tooltip>
+                <Tooltip text="Выбрать файл для подписи"/>
+            </tooltip>
+        </Button>
+    </HBox>
+    <Label text="Ключ ЭЦП:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+    <ComboBox fx:id="keyListComboBox" onHidden="#handleKeyListComboBoxOnHiding"
+              onKeyPressed="#handleKeyListComboBoxOnKeyPressed" prefWidth="620" GridPane.columnIndex="1"
+              GridPane.rowIndex="2">
+        <tooltip>
+            <Tooltip text="Выберите ключ для создания ЭЦП"/>
+        </tooltip>
+    </ComboBox>
+    <Label text="Пароль:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+
+    <PasswordField fx:id="passwordField" onKeyPressed="#handleEnterKeyPressed" GridPane.columnIndex="1"
+                   GridPane.rowIndex="3">
+        <tooltip>
+            <Tooltip text="Пароль для ключа ЭЦП"/>
+        </tooltip>
+    </PasswordField>
+    <AnchorPane GridPane.columnIndex="1" GridPane.rowIndex="4">
+        <CheckBox fx:id="savePassword" selected="true" text="Сохранить пароль до выхода" AnchorPane.leftAnchor="0.0"/>
+        <HBox alignment="BASELINE_RIGHT" AnchorPane.rightAnchor="0.0">
+            <Button onAction="#handleCancelBtnAction" text="Отмена"/>
+            <Button fx:id="signBtn" disable="true" onAction="#handleSignBtnAction" onKeyPressed="#handleEnterKeyPressed"
+                    text="Подписать"/>
+        </HBox>
+    </AnchorPane>
+</GridPane>
