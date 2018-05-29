@@ -4,12 +4,12 @@ import com.elewise.api.*;
 import com.elewise.crypto.ProviderManager;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.net.httpserver.Headers;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.*;
 
+import javax.net.ssl.*;
 import java.io.*;
 import java.net.InetSocketAddress;
+import java.security.KeyStore;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,7 +21,7 @@ import static java.util.Collections.singletonList;
 public class Server {
     private static final Logger logger = Logger.getLogger(Server.class.getName());
     private static final int PORT = 13578;
-    private HttpServer server;
+    private HttpsServer server;
     private int BUFFER_SIZE = 8192;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private ObjectMapper objectMapper;
@@ -30,7 +30,48 @@ public class Server {
         objectMapper = new ObjectMapper();
         objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
         try {
-            this.server = HttpServer.create(new InetSocketAddress(PORT), 0);
+            this.server = HttpsServer.create(new InetSocketAddress(PORT), 0);
+
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+
+            // initialise the keystore
+            char[] password = "password".toCharArray();
+            KeyStore ks = KeyStore.getInstance("JKS");
+            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+            InputStream is = classloader.getResourceAsStream("testkey.jks");
+            ks.load(is, password);
+
+            // setup the key manager factory
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+            kmf.init(ks, password);
+
+            // setup the trust manager factory
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+            tmf.init(ks);
+
+            // setup the HTTPS context and parameters
+            sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+            server.setHttpsConfigurator(new HttpsConfigurator(sslContext) {
+                public void configure(HttpsParameters params) {
+                    try {
+                        // initialise the SSL context
+                        SSLContext c = SSLContext.getDefault();
+                        SSLEngine engine = c.createSSLEngine();
+                        params.setNeedClientAuth(false);
+                        params.setCipherSuites(engine.getEnabledCipherSuites());
+                        params.setProtocols(engine.getEnabledProtocols());
+
+                        // get the default parameters
+                        SSLParameters defaultSSLParameters = c.getDefaultSSLParameters();
+                        params.setSSLParameters(defaultSSLParameters);
+
+                    } catch (Exception ex) {
+                        System.out.println("Failed to create HTTPS port");
+                    }
+                }
+            });
+
+
             server.createContext("/getcert", this::getCert);
             server.createContext("/getcerts", this::getCerts);
             server.createContext("/sign", this::sign);
@@ -149,7 +190,7 @@ public class Server {
 
     private void setHeaders(HttpExchange exchange) {
         Headers responseHeaders = exchange.getResponseHeaders();
-        responseHeaders.set("Access-Control-Allow-Origin", "http://127.0.0.1:"+PORT);
+        responseHeaders.set("Access-Control-Allow-Origin", "*");
         responseHeaders.put("Access-Control-Allow-Headers", asList("Origin", "X-Requested-With", "Content-Type", "Accept"));
         responseHeaders.put("Access-Control-Allow-Methods", asList("GET", "POST"));
         responseHeaders.put("Access-Control-Max-Age", singletonList("86400"));

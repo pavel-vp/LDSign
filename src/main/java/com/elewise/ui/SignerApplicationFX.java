@@ -89,7 +89,7 @@ public class SignerApplicationFX extends Application {
             BufferedImage appIcon = ImageIO.read(getClass().getResource("/images/key.png"));
             this.trayIcon = new TrayIcon(appIcon);
             trayIcon.setImageAutoSize(true);
-            trayIcon.addActionListener(e -> Platform.runLater(this::showStage));
+            //trayIcon.addActionListener(e -> Platform.runLater(this::showStage));
             buildMenu(trayIcon);
             tray.add(trayIcon);
         } catch (Exception e) {
