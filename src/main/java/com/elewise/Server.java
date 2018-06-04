@@ -23,6 +23,7 @@ public class Server {
     private static final int PORT = 13578;
     private HttpsServer server;
     private int BUFFER_SIZE = 8192;
+    private final static String SSL_LOCAL_KEY = "local_key.jks";
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private ObjectMapper objectMapper;
 
@@ -38,7 +39,7 @@ public class Server {
             char[] password = "password".toCharArray();
             KeyStore ks = KeyStore.getInstance("JKS");
             ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-            InputStream is = classloader.getResourceAsStream("testkey.jks");
+            InputStream is = classloader.getResourceAsStream(SSL_LOCAL_KEY);
             ks.load(is, password);
 
             // setup the key manager factory
